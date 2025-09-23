@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Controle - WhatsApp</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --primary-color: #128C7E;
+      --green-accent: #25D366;
+      --red-accent: #e74c3c;
+      --blue-accent: #3498db;
+      --gray-bg: #f4f6f9;
+      --light-gray: #f0f2f5;
+      --dark-text: #2c3e50;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--gray-bg);
+      color: var(--dark-text);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    h1, h2, h4, h5 {
+      color: var(--primary-color);
+      margin-top: 0;
+    }
+
+    h1 {
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.8rem;
+    }
+
+    h1 svg { margin-right: 8px; }
+
+    /* BOTÕES */
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--green-accent);
+      color: white;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: all 0.2s ease;
+      font-size: 0.95em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      filter: brightness(0.92);
+      transform: translateY(-1px);
+    }
+
+    #logout-button { background-color: var(--red-accent); }
+
+    /* INPUTS */
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #dcdcdc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--blue-accent);
+      outline: none;
+    }
+
+    /* DETAILS */
+    details {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      background-color: var(--light-gray);
+      overflow: hidden;
+    }
+
+    summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: #f9f9f9;
+      transition: background-color 0.2s;
+      gap: 8px;
+    }
+
+    summary:hover { background-color: #f1f1f1; }
+    summary svg { color: var(--primary-color); }
+    summary::-webkit-details-marker { display: none; }
+
+    .details-content {
+      padding: 18px;
+      border-top: 1px solid #e0e0e0;
+      background-color: #fff;
+    }
+
+    /* STATUS */
+    .status {
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 6px;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .status.CONNECTED { background-color: var(--green-accent); }
+    .status.DISCONNECTED { background-color: var(--red-accent); }
+    .status.SCAN_QR { background-color: #f39c12; }
+
+    .session-actions .webhooks-btn { background-color: var(--blue-accent); }
+    .session-actions .delete-btn { background-color: var(--red-accent); }
+
+    /* LOG */
+    #log, .curl-example {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: 'Courier New', Courier, monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    #log { height: 160px; overflow-y: auto; }
+    .curl-example { margin-top: 12px; font-size: 0.9em; }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 24px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      border-radius: 10px;
+      position: relative;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .modal-content .close-btn {
+      position: absolute;
+      top: 10px; right: 16px;
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .modal-content .close-btn:hover { color: var(--red-accent); }
+
+    /* API */
+    .api-example-details summary {
+      padding: 12px 16px;
+      font-weight: normal;
+      background-color: #e9ecef;
+    }
+
+    .api-example-details[open] summary {
+      background-color: #d1d9e0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>
+      <span style="display:flex; align-items:center;">
+        <i data-lucide="message-circle"></i> Painel de Controle WhatsApp
+      </span>
+      <button id="logout-button"><i data-lucide="log-out"></i> Sair</button>
+    </h1>
+
+    <!-- Criar Sessão -->
+    <div class="session-creator">
+      <h2><i data-lucide="plus-circle"></i> Criar Nova Sessão</h2>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="new-session-id" placeholder="Nome da sessão (ex: vendas, suporte)" style="flex: 1;">
+        <button id="create-session-btn"><i data-lucide="play"></i> Criar e Iniciar</button>
+      </div>
+    </div>
+
+    <!-- Lista de Sessões -->
+    <div class="session-list">
+      <h2><i data-lucide="list"></i> Sessões</h2>
+      <div id="sessions"></div>
+    </div>
+
+    <!-- Log -->
+    <details class="log-container">
+      <summary><i data-lucide="terminal"></i> Log de Atividades</summary>
+      <div class="details-content">
+        <div id="log"></div>
+      </div>
+    </details>
+
+    <!-- Ferramentas do Desenvolvedor -->
+    <details class="dev-tools">
+      <summary><i data-lucide="code-2"></i> Ferramentas do Desenvolvedor & Exemplos de API</summary>
+      <div class="details-content">
+        <h4><i data-lucide="key"></i> Seu Token de Autenticação</h4>
+        <p>O token abaixo é preenchido automaticamente nos exemplos.</p>
+        <input type="text" id="auth-token-field" readonly style="cursor: copy; background-color: #f1f1f1; font-family: 'Courier New', monospace; font-size: 0.9em;">
+        <hr style="margin: 20px 0;">
+        <h4><i data-lucide="terminal-square"></i> Exemplos de Comando cURL</h4>
+
+        <!-- API Examples -->
+        <details class="api-example-details">
+          <summary><i data-lucide="send"></i> 1. Enviar Mensagem de Texto</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/send" \
+--header "Authorization: <span class="api-token"></span>" \
+--header "Content-Type: application/json" \
+--data-raw '{
+  "sessionId": "nome_da_sua_sessao",
+  "to": "5511987654321",
+  "text": "Olá do servidor!"
+}'</div>
+        </details>
+
+        <details class="api-example-details">
+          <summary><i data-lucide="type"></i> 2. Enviar Status "Digitando..."</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/presence/typing" \
+--header "Authorization: <span class="api-token"></span>" \
+--header "Content-Type: application/json" \
+--data-raw '{
+  "sessionId": "nome_da_sua_sessao",
+  "to": "5511987654321",
+  "duration": 5000
+}'</div>
+        </details>
+
+        <details class="api-example-details">
+          <summary><i data-lucide="image"></i> 3. Enviar Arquivo de Imagem</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/send-media/file" \
+--header "Authorization: <span class="api-token"></span>" \
+--form "sessionId=nome_da_sua_sessao" \
+--form "to=5511987654321" \
+--form "type=image" \
+--form "caption=Olha que legal essa imagem!" \
+--form "media=@/caminho/para/sua/foto.jpg"</div>
+        </details>
+
+        <details class="api-example-details">
+          <summary><i data-lucide="video"></i> 4. Enviar Arquivo de Vídeo</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/send-media/file" \
+--header "Authorization: <span class="api-token"></span>" \
+--form "sessionId=nome_da_sua_sessao" \
+--form "to=5511987654321" \
+--form "type=video" \
+--form "caption=Confira este vídeo!" \
+--form "media=@/caminho/para/seu/video.mp4"</div>
+        </details>
+
+        <details class="api-example-details">
+          <summary><i data-lucide="file-text"></i> 5. Enviar Documento</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/send-media/file" \
+--header "Authorization: <span class="api-token"></span>" \
+--form "sessionId=nome_da_sua_sessao" \
+--form "to=5511987654321" \
+--form "type=document" \
+--form "filename=Relatorio_Final.pdf" \
+--form "media=@/caminho/para/seu/documento.pdf"</div>
+        </details>
+
+        <details class="api-example-details">
+          <summary><i data-lucide="mic"></i> 6. Enviar Nota de Voz (PTT)</summary>
+          <div class="curl-example">curl --location --request POST "http://<span class="api-host"></span>/send-media/ptt" \
+--header "Authorization: <span class="api-token"></span>" \
+--form "sessionId=nome_da_sua_sessao" \
+--form "to=5511987654321" \
+--form "media=@/caminho/para/seu/audio.mp3"</div>
+        </details>
+      </div>
+    </details>
+  </div>
+
+  <!-- Modal do QR Code -->
+  <div id="qr-modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal-btn" class="close-btn">&times;</span>
+      <h2 id="qr-modal-title">Escaneie o QR Code</h2>
+      <img id="qr-code-img" src="" alt="QR Code" style="max-width: 100%; margin-top: 15px; border: 1px solid #ddd; border-radius: 6px;">
+    </div>
+  </div>
+
+  <script src="/main.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

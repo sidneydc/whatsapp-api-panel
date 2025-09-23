@@ -1,0 +1,13 @@
+# Dependências do Node.js
+node_modules/
+
+# Credenciais e sessões do WhatsApp
+wa_credentials/
+
+# Arquivos de log e temporários
+*.log
+downloads/
+webhooks.json
+
+# Arquivos de ambiente (se usar no futuro)
+.env

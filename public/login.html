@@ -1,0 +1,37 @@
+<!-- public/login.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Painel WhatsApp</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; font-family: system-ui, sans-serif; }
+        .login-container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 320px; }
+        h1 { color: #128C7E; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #25D366; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        #error-message { color: #e74c3c; margin-top: 15px; min-height: 20px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Acessar Painel</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+        <p id="error-message"></p>
+    </div>
+    <!-- 5. CRIAMOS UM JS SEPARADO PARA O LOGIN -->
+    <script src="/auth.js"></script>
+</body>
+</html>
