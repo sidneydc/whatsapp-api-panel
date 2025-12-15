@@ -1,17 +1,17 @@
 import { proto } from "@whiskeysockets/baileys";
-import { Messages } from "../Defaults";
-import { getSession } from "../Socket";
+import { Messages } from "../Defaults/index.js";
+import { getSession } from "../Socket/index.js";
 import {
   SendMediaTypes,
   SendMessageTypes,
   SendReadTypes,
   SendTypingTypes,
-} from "../Types";
-import { phoneToJid } from "../Utils";
-import { createDelay } from "../Utils/create-delay";
-import { isExist } from "../Utils/is-exist";
+} from "../Types/index.js";
+import { phoneToJid } from "../Utils/index.js";
+import { createDelay } from "../Utils/create-delay.js";
+import { isExist } from "../Utils/is-exist.js";
 import mime from "mime";
-import { WhatsappError } from "../Error";
+import { WhatsappError } from "../Error/index.js";
 
 export const sendTextMessage = async ({
   sessionId,
@@ -19,7 +19,7 @@ export const sendTextMessage = async ({
   text = "",
   isGroup = false,
   ...props
-}: SendMessageTypes): Promise<proto.WebMessageInfo | undefined> => {
+}: SendMessageTypes): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -30,7 +30,7 @@ export const sendTextMessage = async ({
       text: text,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };
@@ -41,7 +41,7 @@ export const sendImage = async ({
   isGroup = false,
   media,
   ...props
-}: SendMediaTypes): Promise<proto.WebMessageInfo | undefined> => {
+}: SendMediaTypes): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -60,7 +60,7 @@ export const sendImage = async ({
       caption: text,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };
@@ -71,7 +71,7 @@ export const sendVideo = async ({
   isGroup = false,
   media,
   ...props
-}: SendMediaTypes): Promise<proto.WebMessageInfo | undefined> => {
+}: SendMediaTypes): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -90,7 +90,7 @@ export const sendVideo = async ({
       caption: text,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };
@@ -104,7 +104,7 @@ export const sendDocument = async ({
   ...props
 }: SendMediaTypes & {
   filename: string;
-}): Promise<proto.WebMessageInfo | undefined> => {
+}): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -132,7 +132,7 @@ export const sendDocument = async ({
       caption: text,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };
@@ -143,7 +143,7 @@ export const sendVoiceNote = async ({
   isGroup = false,
   media,
   ...props
-}: Omit<SendMediaTypes, "text">): Promise<proto.WebMessageInfo | undefined> => {
+}: Omit<SendMediaTypes, "text">): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -164,7 +164,7 @@ export const sendVoiceNote = async ({
       ptt: true,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };
@@ -175,7 +175,7 @@ export const sendSticker = async ({
   isGroup,
   media,
   ...props
-}: SendMediaTypes): Promise<proto.WebMessageInfo | undefined> => {
+}: SendMediaTypes): Promise<proto.IWebMessageInfo | undefined> => {
   const session = getSession(sessionId);
   if (!session) throw new WhatsappError(Messages.sessionNotFound(sessionId));
   to = phoneToJid({ to, isGroup });
@@ -195,7 +195,7 @@ export const sendSticker = async ({
           : media,
     },
     {
-      quoted: props.answering,
+      quoted: props.answering as any,
     }
   );
 };

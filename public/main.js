@@ -244,6 +244,14 @@ function closeModal() {
 
 // --- INICIALIZAÇÃO E EVENTOS GLOBAIS (EXATAMENTE A SUA VERSÃO) ---
 createSessionBtn.addEventListener('click', createSession);
+
+// Botão de atualizar sessões
+document.getElementById('refresh-sessions-btn').addEventListener('click', async () => {
+    addLog('Atualizando lista de sessões...');
+    await renderSessions();
+    addLog('Lista de sessões atualizada!');
+});
+
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('authToken');
     addLog('Usuário deslogado.');

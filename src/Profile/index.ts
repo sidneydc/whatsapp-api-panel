@@ -1,7 +1,7 @@
-import { Messages } from "../Defaults";
-import { WhatsappError } from "../Error";
-import { getSession } from "../Socket";
-import { GetProfileInfoProps } from "../Types/profile";
+import { Messages } from "../Defaults/index.js";
+import { WhatsappError } from "../Error/index.js";
+import { getSession } from "../Socket/index.js";
+import { GetProfileInfoProps } from "../Types/profile.js";
 
 /**
  * Get profile information of a target (people or group)

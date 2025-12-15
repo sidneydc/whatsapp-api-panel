@@ -1,7 +1,7 @@
 // server.js (VERSÃO FINAL CONSOLIDADA COM TODAS AS FUNCIONALIDADES)
 
 import express from "express";
-import * as whatsapp from "wa-multi-session";
+import * as whatsapp from "./dist/index.js";
 import qrcode from "qrcode";
 import fs from 'fs';
 import authenticate from './auth.js';
@@ -55,8 +55,36 @@ const dispatchWebhook = async (sessionId, event, data) => {
     }
 };
 
+// --- FUNÇÃO PARA SINCRONIZAR ESTADOS DAS SESSÕES ---
+const syncSessionStates = () => {
+    const sessions = whatsapp.getAllSession();
+    console.log(`[SYNC] Sincronizando estado de ${sessions.length} sessões...`);
+    
+    sessions.forEach(sessionId => {
+        try {
+            const session = whatsapp.getSession(sessionId);
+            if (session && session.user) {
+                // Sessão existe e está conectada
+                if (!sessionStates.has(sessionId) || sessionStates.get(sessionId)?.status !== 'CONNECTED') {
+                    console.log(`[SYNC] Restaurando estado CONNECTED para sessão: ${sessionId}`);
+                    sessionStates.set(sessionId, { status: 'CONNECTED' });
+                }
+            } else if (session && !session.user) {
+                // Sessão existe mas não está totalmente conectada
+                if (!sessionStates.has(sessionId)) {
+                    console.log(`[SYNC] Definindo estado inicial para sessão: ${sessionId}`);
+                    sessionStates.set(sessionId, { status: 'DISCONNECTED' });
+                }
+            }
+        } catch (error) {
+            console.error(`[SYNC] Erro ao verificar sessão ${sessionId}:`, error.message);
+        }
+    });
+};
+
 // --- LISTENERS GLOBAIS DO WHATSAPP ---
 whatsapp.onQRUpdated(async ({ sessionId, qr }) => {
+    console.log(`[EVENTO] QR Code atualizado para sessão: ${sessionId}`);
     const qrCodeUrl = await qrcode.toDataURL(qr);
     sessionStates.set(sessionId, { status: 'SCAN_QR', qrCodeUrl });
 });
@@ -71,8 +99,17 @@ whatsapp.onDisconnected((sessionId) => {
     sessionStates.set(sessionId, { status: 'DISCONNECTED' });
 });
 
+whatsapp.onConnecting((sessionId) => {
+    console.log(`[EVENTO] Sessão conectando: ${sessionId}`);
+    if (!sessionStates.has(sessionId)) {
+        sessionStates.set(sessionId, { status: 'CONNECTING' });
+    }
+});
+
 // VERSÃO FINAL - USA OS MÉTODOS .save<Media>() DO README
 whatsapp.onMessageReceived(async (msg) => {
+    console.log(`[EVENTO] Mensagem recebida na sessão: ${msg.sessionId}`);
+    
     // Ignora mensagens de status, mensagens sem conteúdo ou as que nós mesmos enviamos.
     if (msg.key.remoteJid === 'status@broadcast' || !msg.message || msg.key.fromMe) {
         return;
@@ -153,12 +190,23 @@ app.post("/login", (req, res) => {
 app.use('/sessions', authenticate);
 app.use('/send', authenticate);
 app.use('/presence', authenticate);
-app.use('/send-media', authenticate);
-
 // Gerenciamento de Sessões
 app.get("/sessions", (req, res) => {
+    // Sincroniza estados antes de retornar (garante informações atualizadas)
+    syncSessionStates();
+    
     const sessions = whatsapp.getAllSession();
-    const sessionDetails = sessions.map(id => ({ id, status: sessionStates.get(id)?.status || 'DISCONNECTED' }));
+    const sessionDetails = sessions.map(id => {
+        const state = sessionStates.get(id);
+        return { 
+            id, 
+            status: state?.status || 'DISCONNECTED',
+            // Informação extra para debug
+            hasState: sessionStates.has(id)
+        };
+    });
+    
+    console.log(`[API] Retornando ${sessionDetails.length} sessões.`);
     res.json(sessionDetails);
 });
 
@@ -193,7 +241,8 @@ app.get("/sessions/:sessionId/status", (req, res) => {
 app.delete("/sessions/:sessionId", async (req, res) => {
     const { sessionId } = req.params;
     try {
-        await whatsapp.deleteSession(sessionId);
+        // Passa true para deletar as credenciais quando o usuário solicita delete manual
+        await whatsapp.deleteSession(sessionId, true);
         sessionStates.delete(sessionId);
         const credsDir = `wa_credentials/${sessionId}`;
         if (fs.existsSync(credsDir)) fs.rmSync(credsDir, { recursive: true, force: true });
@@ -331,7 +380,25 @@ app.post('/send-media/ptt', upload.single('media'), async (req, res) => {
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(3333, () => {
-    console.log("Servidor Express rodando em http://localhost:3333" );
+    console.log("=".repeat(60));
+    console.log("🚀 Servidor Express rodando em http://localhost:3333");
+    console.log("=".repeat(60));
+    
     // Carrega as sessões salvas. Os listeners globais já estão ativos.
+    console.log("[INIT] Carregando sessões do armazenamento...");
     whatsapp.loadSessionsFromStorage();
+    
+    // Aguarda um pouco para as sessões carregarem e então sincroniza os estados
+    setTimeout(() => {
+        syncSessionStates();
+        console.log("[INIT] Sincronização inicial concluída.");
+    }, 3000);
+    
+    // Sincronização periódica a cada 30 segundos para manter estados atualizados
+    setInterval(() => {
+        syncSessionStates();
+    }, 30000);
+    
+    console.log("[INIT] Sistema de sincronização de sessões ativado.");
+    console.log("=".repeat(60));
 });

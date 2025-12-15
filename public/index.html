@@ -72,7 +72,12 @@
       transform: translateY(-1px);
     }
 
+    button:active {
+      transform: translateY(0);
+    }
+
     #logout-button { background-color: var(--red-accent); }
+    #refresh-sessions-btn { background-color: var(--blue-accent); }
 
     /* INPUTS */
     input[type="text"], textarea {
@@ -218,7 +223,12 @@
 
     <!-- Lista de Sessões -->
     <div class="session-list">
-      <h2><i data-lucide="list"></i> Sessões</h2>
+      <h2 style="display: flex; justify-content: space-between; align-items: center;">
+        <span><i data-lucide="list"></i> Sessões</span>
+        <button id="refresh-sessions-btn" style="background-color: var(--blue-accent); margin: 0;">
+          <i data-lucide="refresh-cw"></i> Atualizar
+        </button>
+      </h2>
       <div id="sessions"></div>
     </div>
 

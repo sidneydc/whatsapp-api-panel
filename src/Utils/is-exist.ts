@@ -1,7 +1,7 @@
-import { WhatsappError } from "../Error";
-import { getSession } from "../Socket";
-import { SendMessageTypes } from "../Types";
-import { phoneToJid } from "./phone-to-jid";
+import { WhatsappError } from "../Error/index.js";
+import { getSession } from "../Socket/index.js";
+import { SendMessageTypes } from "../Types/index.js";
+import { phoneToJid } from "./phone-to-jid.js";
 
 export const isExist = async ({
   sessionId,

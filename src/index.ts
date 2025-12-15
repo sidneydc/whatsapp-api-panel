@@ -1,8 +1,8 @@
-export * from "./Socket";
-export * from "./Messaging";
-export * from "./Utils";
-export * from "./Types";
-export * from "./Profile";
-export * from "./Error";
+export * from "./Socket/index.js";
+export * from "./Messaging/index.js";
+export * from "./Utils/index.js";
+export * from "./Types/index.js";
+export * from "./Profile/index.js";
+export * from "./Error/index.js";
 
 export * as baileys from "@whiskeysockets/baileys";

@@ -11,6 +11,7 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node ./dist/index.js",
+    "server": "node --experimental-specifier-resolution=node --experimental-global-webcrypto server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mimamch",
@@ -19,7 +20,7 @@
     "@adiwajshing/keyed-db": "^0.2.4",
     "@hapi/boom": "^10.0.1",
     "@types/qrcode-terminal": "^0.12.2",
-    "@whiskeysockets/baileys": "^6.7.18",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "axios": "^1.12.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",

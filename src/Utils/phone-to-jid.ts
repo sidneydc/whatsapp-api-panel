@@ -1,4 +1,4 @@
-import { WhatsappError } from "../Error";
+import { WhatsappError } from "../Error/index.js";
 import PHONENUMBER_MCC from "@whiskeysockets/baileys";
 
 const isPhoneNumberValidCountry = (phone: string) => {
